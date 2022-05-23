@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lyc.reggie.entity.Employee;
 import com.lyc.reggie.mapper.EmployeeMapper;
 import com.lyc.reggie.service.EmployeeService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**

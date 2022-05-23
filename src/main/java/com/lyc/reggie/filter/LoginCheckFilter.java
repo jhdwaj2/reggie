@@ -39,7 +39,8 @@ public class LoginCheckFilter implements Filter {
                 "/backend/**",
                 "/front/**",
                 "/employee/login",
-                "/employee/logout"
+                "/employee/logout",
+                "/favicon.ico"
         };
 //        判断请求是否需要处理
         boolean check = check(urls, requestURI);
@@ -67,8 +68,8 @@ public class LoginCheckFilter implements Filter {
             }
         }
 
-        long id = Thread.currentThread().getId();
-        log.info("线程id{}",id);
+//        long id = Thread.currentThread().getId();
+//        log.info("线程id{}",id);
 
     }
 
