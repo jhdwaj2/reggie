@@ -102,28 +102,47 @@ public class DishController {
         return R.success("修改菜品成功");
     }
 
-    @PostMapping("/status/0{ids}")
-    public R<String> Discontinued(@PathVariable Long ids){
-
-        DishDto dishDto = new DishDto();
-
-
-        Dish dish = dishService.getById(ids);
-        dish.setStatus(0);
-
-//        获取dish
-        BeanUtils.copyProperties(dish,dishDto);
-
-//        获取flavor
-        List<DishFlavor> flavorList = dishFlavorService.getByDishId(ids);
-
-        dishDto.setFlavors(flavorList);
-
-//        修改状态
-        dishService.updateWithFlavor(dishDto);
-
-        return R.success("修改成功");
+    @PostMapping("/status/0")
+    public R<String> discontinued(@RequestParam List<Long> id){
+        LambdaQueryWrapper<Dish> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(Dish::getId,id);
+        List<Dish> list = dishService.list(wrapper);
+        for (Dish dish:list){
+            dish.setStatus(0);
+            dishService.updateById(dish);
+        }
+        return R.success("停售成功");
     }
 
 
+    @PostMapping("/status/1")
+    public R<String> startSelling(@RequestParam List<Long> id){
+        LambdaQueryWrapper<Dish> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(Dish::getId,id);
+        List<Dish> list = dishService.list(wrapper);
+        for (Dish dish:list){
+            dish.setStatus(1);
+            dishService.updateById(dish);
+        }
+        return R.success("起售成功");
+    }
+
+
+    @DeleteMapping
+    public R<String> delete(@RequestParam List<Long> ids){
+        dishService.removeWithFlavor(ids);
+        return R.success("删除成功");
+    }
+
+
+
+
+    @GetMapping("/list")
+    public R<List<Dish>> list(Dish dish){
+        LambdaQueryWrapper<Dish> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
+        wrapper.eq(Dish::getStatus,1);
+        List<Dish> list = dishService.list(wrapper);
+        return R.success(list);
+    }
 }

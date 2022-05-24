@@ -50,10 +50,10 @@ public class LoginCheckFilter implements Filter {
             log.info("本次请求{}不需要处理",requestURI);
             filterChain.doFilter(request, response);
         }else{
-//            log.info("请求{}被拦截",requestURI);
 //            判断登录状态
             if(request.getSession().getAttribute("employee")==null){
 //                登录状态为空,返回登录页面
+                log.info("请求{}被拦截",requestURI);
                 log.info("用户未登录");
                 response.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
             }else{
