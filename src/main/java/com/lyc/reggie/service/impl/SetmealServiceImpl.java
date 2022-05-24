@@ -12,6 +12,7 @@ import com.lyc.reggie.mapper.SetmealMapper;
 import com.lyc.reggie.service.CategoryService;
 import com.lyc.reggie.service.SetmealDishService;
 import com.lyc.reggie.service.SetmealService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,5 +66,38 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
 
         setmealDishService.remove(queryWrapper);
 
+    }
+
+    @Override
+    public SetmealDto getByIdWithDish(Long id) {
+        Setmeal setmeal = this.getById(id);
+
+        SetmealDto setmealDto = new SetmealDto();
+
+        BeanUtils.copyProperties(setmeal,setmealDto);
+
+        LambdaQueryWrapper<SetmealDish> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SetmealDish::getSetmealId,setmeal.getId());
+
+        List<SetmealDish> list = setmealDishService.list(wrapper);
+
+        setmealDto.setSetmealDishes(list);
+        return setmealDto;
+    }
+
+    @Override
+    public void updateWithDish(SetmealDto setmealDto) {
+        this.updateById(setmealDto);
+
+        LambdaQueryWrapper<SetmealDish> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SetmealDish::getSetmealId,setmealDto.getId());
+
+        setmealDishService.remove(wrapper);
+
+        List<SetmealDish> setmealDishes = setmealDto.getSetmealDishes();
+
+        setmealDishes=setmealDishes.stream().peek((item)->item.setSetmealId(setmealDto.getId())).collect(Collectors.toList());
+
+        setmealDishService.saveBatch(setmealDishes);
     }
 }

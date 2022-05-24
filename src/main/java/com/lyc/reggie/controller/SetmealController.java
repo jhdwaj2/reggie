@@ -41,6 +41,15 @@ public class SetmealController {
         return R.success("添加套餐成功");
     }
 
+
+    @PutMapping
+    public R<String> update(@RequestBody SetmealDto setmealDto){
+        setmealService.updateWithDish(setmealDto);
+
+        return R.success("修改套餐成功");
+    }
+
+
     @GetMapping("/page")
     public R<Page> page(int page,int pageSize,String name){
 
@@ -107,6 +116,16 @@ public class SetmealController {
             setmealService.updateById(s);
         }
         return R.success("修改成功");
+    }
+
+    @GetMapping("{id}")
+    public R<SetmealDto> getById(@PathVariable Long id){
+        SetmealDto setmealDto=setmealService.getByIdWithDish(id);
+        if (setmealDto==null){
+            return R.error("未查询到菜品信息");
+        }
+
+        return R.success(setmealDto);
     }
 
 
