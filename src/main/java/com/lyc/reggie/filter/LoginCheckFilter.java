@@ -18,53 +18,67 @@ import java.io.IOException;
  * Description:
  */
 
-@WebFilter(filterName = "loginCheckFilter",urlPatterns = "/*")
+@WebFilter(filterName = "loginCheckFilter", urlPatterns = "/*")
 @Slf4j
 public class LoginCheckFilter implements Filter {
 
-    private static final AntPathMatcher PATH_MATCHER=new AntPathMatcher();
+    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
-        HttpServletRequest request=(HttpServletRequest) servletRequest;
-        HttpServletResponse response=(HttpServletResponse) servletResponse;
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        HttpServletResponse response = (HttpServletResponse) servletResponse;
 //        获取请求的uri
         String requestURI = request.getRequestURI();
-        log.info("拦截到请求:{}",requestURI);
+        log.info("拦截到请求:{}", requestURI);
 
 //        定义不需要处理的请求路径
-        String[] urls=new String[]{
+        String[] urls = new String[]{
                 "/backend/**",
                 "/front/**",
                 "/employee/login",
                 "/employee/logout",
-                "/favicon.ico"
+                "/favicon.ico",
+                "/user/sendMsg",
+                "/user/login"
         };
 //        判断请求是否需要处理
         boolean check = check(urls, requestURI);
 
-        if(check){
+        if (check) {
 //            不需要处理直接放行
-            log.info("本次请求{}不需要处理",requestURI);
+            log.info("本次请求{}不需要处理", requestURI);
             filterChain.doFilter(request, response);
-        }else{
+        } else {
 //            判断登录状态
-            if(request.getSession().getAttribute("employee")==null){
-//                登录状态为空,返回登录页面
-                log.info("请求{}被拦截",requestURI);
-                log.info("用户未登录");
-                response.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
-            }else{
-//                已登录,放行
-                Long empId = (Long)request.getSession().getAttribute("employee");
+            if (request.getSession().getAttribute("employee") != null) {
+                //                已登录,放行
+                Long empId = (Long) request.getSession().getAttribute("employee");
 
-                log.info("用户{}已登陆",empId);
+                log.info("用户{}已登陆", empId);
 
                 BaseContent.setCurrentId(empId);
 
                 filterChain.doFilter(request, response);
+                return;
+            } else if (request.getSession().getAttribute("user") != null) {
+                //                已登录,放行
+                Long userId = (Long) request.getSession().getAttribute("user");
+
+                log.info("用户{}已登陆", userId);
+
+                BaseContent.setCurrentId(userId);
+
+                filterChain.doFilter(request, response);
+                return;
+            } else {
+//                登录状态为空,返回登录页面
+                log.info("请求{}被拦截", requestURI);
+                log.info("用户未登录");
+                response.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
+
             }
         }
 
@@ -75,14 +89,15 @@ public class LoginCheckFilter implements Filter {
 
     /**
      * 判断uri是否是不需要拦截的
-     * @param uris 不需要拦截的uri集
+     *
+     * @param uris       不需要拦截的uri集
      * @param requestURI 传入的请求uri
      * @return
      */
-    private boolean check(String[] uris,String requestURI){
-        for(String uri:uris){
+    private boolean check(String[] uris, String requestURI) {
+        for (String uri : uris) {
             boolean match = PATH_MATCHER.match(uri, requestURI);
-            if(match){
+            if (match) {
                 return true;
             }
         }
