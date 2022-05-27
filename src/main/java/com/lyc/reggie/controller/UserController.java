@@ -86,4 +86,10 @@ public class UserController {
         }
     }
 
+    @PostMapping("/logout")
+    public R<String> logout(HttpSession session){
+        session.removeAttribute("user");
+        return R.success("推出成功");
+    }
+
 }
