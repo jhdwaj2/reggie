@@ -6,6 +6,7 @@ import com.lyc.reggie.common.R;
 import com.lyc.reggie.dto.DishDto;
 import com.lyc.reggie.entity.Category;
 import com.lyc.reggie.entity.Dish;
+import com.lyc.reggie.entity.DishFlavor;
 import com.lyc.reggie.service.CategoryService;
 import com.lyc.reggie.service.DishFlavorService;
 import com.lyc.reggie.service.DishService;
@@ -135,12 +136,46 @@ public class DishController {
 
 
 
+//    @GetMapping("/list")
+//    public R<List<Dish>> list(Dish dish){
+//        LambdaQueryWrapper<Dish> wrapper = new LambdaQueryWrapper<>();
+//        wrapper.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
+//        wrapper.eq(Dish::getStatus,1);
+//        List<Dish> list = dishService.list(wrapper);
+//        return R.success(list);
+//    }
+
     @GetMapping("/list")
-    public R<List<Dish>> list(Dish dish){
+    public R<List<DishDto>> list(Dish dish){
         LambdaQueryWrapper<Dish> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
         wrapper.eq(Dish::getStatus,1);
+        wrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+
         List<Dish> list = dishService.list(wrapper);
-        return R.success(list);
+
+        List<DishDto> dishDtoList=list.stream().map((item)->{
+            DishDto dishDto = new DishDto();
+            BeanUtils.copyProperties(item,dishDto);
+
+            Long id = item.getCategoryId();
+            Category category = categoryService.getById(id);
+
+            if(category!=null){
+                String categoryName = category.getName();
+                dishDto.setCategoryName(categoryName);
+            }
+
+
+            Long dishId = item.getId();
+            LambdaQueryWrapper<DishFlavor> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(DishFlavor::getDishId,dishId);
+            List<DishFlavor> dishFlavorList = dishFlavorService.list(queryWrapper);
+            dishDto.setFlavors(dishFlavorList);
+            return dishDto;
+        }).collect(Collectors.toList());
+
+        return R.success(dishDtoList);
     }
+
 }

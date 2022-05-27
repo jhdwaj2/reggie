@@ -65,7 +65,7 @@ public class LoginCheckFilter implements Filter {
                 return;
             } else if (request.getSession().getAttribute("user") != null) {
                 //                已登录,放行
-                Long userId = (Long) request.getSession().getAttribute("user");
+                Long userId =(Long) request.getSession().getAttribute("user");
 
                 log.info("用户{}已登陆", userId);
 
