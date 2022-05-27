@@ -28,7 +28,7 @@ public class SendMailServiceImpl implements SendMailService {
 
     private String code="";
 
-    private String contextSuf=",请妥善保管,切勿告诉他人.";
+    private String contextSuf=",请在5分钟的有效期内使用,并不要告诉他人.";
 
 
     @Override
