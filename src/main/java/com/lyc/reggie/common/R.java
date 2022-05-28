@@ -2,6 +2,7 @@ package com.lyc.reggie.common;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +12,7 @@ import java.util.Map;
  * Description: 通用返回结果类,服务端响应的数据最终都会封装成此对象
  */
 @Data
-public class R<T> {
+public class R<T> implements Serializable {
 
     private Integer code;   //状态码,1标识成功,0标识失败
     private String msg;     //提示消息
