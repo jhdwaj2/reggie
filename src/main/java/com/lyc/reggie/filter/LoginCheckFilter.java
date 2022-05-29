@@ -42,7 +42,11 @@ public class LoginCheckFilter implements Filter {
                 "/employee/logout",
                 "/favicon.ico",
                 "/user/sendMsg",
-                "/user/login"
+                "/user/login",
+                "/doc.html",
+                "/webjars/**",
+                "/swagger-resources",
+                "/v2/api-docs"
         };
 //        判断请求是否需要处理
         boolean check = check(urls, requestURI);
